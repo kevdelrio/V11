@@ -3,7 +3,7 @@ import React from 'react';
 import { PRICE_TIERS } from '@/constants';
 import type { PriceTier } from '@/types';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import QuoteForm from './QuoteForm';
+
 
 const PriceCard: React.FC<PriceTier> = ({ icon, title, basePrice, priceSuffix, baseDescription, features, note }) => (
   <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col text-center group h-full">
@@ -57,7 +57,7 @@ const Pricing: React.FC = () => {
           <p className="font-semibold text-slate-600">Note : Toute pièce, même de moins de 7m² (dressing, petit bureau, etc.), est considérée comme une pièce supplémentaire.</p>
         </div>
 
-        <QuoteForm />
+        
       </div>
     </section>
   );
