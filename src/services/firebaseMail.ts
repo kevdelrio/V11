@@ -1,4 +1,3 @@
-// src/services/firebaseMail.ts — REMPLACE TOUT (ajout du champ appointment)
 export type SendMailPayload = {
   type: string;
   name: string;
