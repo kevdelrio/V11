@@ -62,34 +62,10 @@ export interface FaqItem {
   answer: string;
 }
 
-export type BookingStepId = 'service' | 'date' | 'info' | 'confirmation';
-
-export interface BookingStep {
+export interface Step {
     id: string;
     name: string;
     icon: React.FC<{className?: string}>;
-}
-
-export interface BookingState {
-    service: Service | null;
-    date: Date | null;
-    time: string | null;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    propertyAddress: string;
-    notes: string;
-    // For EDL
-    bookingType: 'entree' | 'sortie';
-    typeBien: 'appartement' | 'maison' | 'villa' | 'studio' | 'kot' | 'entrepot';
-    chambres: number;
-    sdb: number;
-    meuble: boolean;
-    jardin: boolean;
-    parking: boolean;
-    cave: boolean;
-    print: boolean;
 }
 
 export interface PriceMap {
