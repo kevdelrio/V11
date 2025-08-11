@@ -3,6 +3,7 @@ import { calculatePrice } from '@/utils/pricing';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { CalculatorState, CalculatorContact } from '@/types';
 import { CALCULATOR_STEPS } from '@/constants';
+import { sendMail } from '@/services/firebaseMail';
 
 const initialCalculatorState: CalculatorState = {
   mission: 'locatif',
@@ -78,6 +79,7 @@ const CalculatorForm: React.FC = () => {
     };
   });
   const [currentStep, setCurrentStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleMissionChange = (newMission: CalculatorState['mission']) => {
     const defaultStateForMission: CalculatorState = {
@@ -127,16 +129,40 @@ const CalculatorForm: React.FC = () => {
     }));
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const subject = `Demande d'informations - ${contact.missionDetail}`;
     const summary = `Mission: ${state.mission}\nType de bien: ${state.typeBien}\nPrix total: ${total.toFixed(2)} €\nRésumé: ${state.chambres} ch., ${state.sdb} sdb, ${state.surface} m²`;
-    const body = encodeURIComponent(
-      `${summary}\nDate souhaitée: ${contact.appointmentDate}\nAdresse du bien: ${contact.propertyAddress}\nNom et prénom: ${contact.fullName}\nEmail: ${contact.email}\nTéléphone: ${contact.phone}\n\n${contact.message}`
-    );
-    window.location.href = `mailto:Info@kdexpertise.be?subject=${encodeURIComponent(
-      subject
-    )}&body=${body}`;
+    const message = `${summary}\nDate souhaitée: ${contact.appointmentDate}\nAdresse du bien: ${contact.propertyAddress}\nNom et prénom: ${contact.fullName}\nEmail: ${contact.email}\nTéléphone: ${contact.phone}\n\n${contact.message}`;
+    try {
+      await sendMail({
+        type: 'calculator',
+        name: contact.fullName,
+        email: contact.email,
+        phone: contact.phone,
+        message,
+        subject,
+        page: 'calculator',
+        source: 'site',
+        appointment: contact.appointmentDate,
+      });
+      alert('Demande envoyée avec succès.');
+      const detail = missionDetailOptions[state.mission][0];
+      setContact({
+        propertyAddress: '',
+        fullName: '',
+        email: '',
+        phone: '',
+        missionDetail: detail,
+        appointmentDate: '',
+        message: createMessage(detail),
+      });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Erreur lors de l\'envoi.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const nextStep = () =>
@@ -252,9 +278,10 @@ const CalculatorForm: React.FC = () => {
             />
             <button
               type="submit"
-              className="w-full px-4 py-3 bg-orange-vif text-white rounded-lg font-semibold hover:bg-orange-vif-dark transition"
+              disabled={isSubmitting}
+              className="w-full px-4 py-3 bg-orange-vif text-white rounded-lg font-semibold hover:bg-orange-vif-dark transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Envoyer ma demande
+              {isSubmitting ? 'Envoi en cours...' : 'Envoyer ma demande'}
             </button>
           </form>
           <div className="mt-6 text-center">
