@@ -112,7 +112,7 @@ const CalculatorForm: React.FC = () => {
     setState(prev => ({ ...prev, [name]: val }));
   };
 
-  const { pricePerParty, total, isPerParty } = calculatePrice(state);
+  const { total, isPerParty } = calculatePrice(state);
 
   const handleContactChange = (
     e: React.ChangeEvent<
@@ -283,8 +283,8 @@ const CalculatorForm: React.FC = () => {
       </div>
 
       <div className="bg-white p-6 rounded-b-lg shadow-inner">
-        <div className="grid md:grid-cols-3 gap-8 items-start">
-          <div className="md:col-span-2 space-y-6">
+        <div className="grid md:grid-cols-2 gap-8 items-start">
+          <div className="space-y-6">
             {state.mission === 'locatif' && (
               <>
                 <div className="grid sm:grid-cols-2 gap-6">
@@ -596,39 +596,24 @@ const CalculatorForm: React.FC = () => {
           </div>
 
           <div className="bg-gray-50 p-6 rounded-lg shadow-inner mt-6 md:mt-0">
-            <h4 className="text-xl font-bold text-blue-deep mb-4 text-center">Estimation du coût</h4>
-            {total === 0 && state.mission !== 'locatif' ? (
-              <p className="text-center text-2xl font-bold text-blue-deep">Sur devis</p>
-            ) : (
-              <div className="space-y-4">
-                {isPerParty && state.frais === '2parties' && (
-                  <>
-                    <div className="flex justify-between items-center text-lg">
-                      <span className="text-slate-600">Part Propriétaire :</span>
-                      <span className="font-semibold text-blue-deep">{pricePerParty.toFixed(2)} €</span>
-                    </div>
-                    <div className="flex justify-between items-center text-lg">
-                      <span className="text-slate-600">Part Locataire :</span>
-                      <span className="font-semibold text-blue-deep">{pricePerParty.toFixed(2)} €</span>
-                    </div>
-                  </>
-                )}
-                {!isPerParty && (
-                  <div className="text-center text-sm text-slate-500 mb-2">
-                    Le prix est un forfait total.
-                  </div>
-                )}
-                <div className="border-t border-gray-200 my-2" />
-                <div className="flex justify-between items-center text-2xl font-bold">
-                  <span className="text-orange-vif">
-                    {isPerParty && state.frais === '1seulepartie'
-                      ? 'Total à votre charge :'
-                      : 'Total TVAC :'}
-                  </span>
-                  <span className="text-orange-vif">{total.toFixed(2)} €</span>
-                </div>
-              </div>
-            )}
+            <h4 className="text-xl font-bold text-blue-deep mb-4 text-center">Récapitulatif</h4>
+            <div className="space-y-2 text-sm text-slate-600">
+              <p>
+                <strong>Type de mission :</strong> {state.mission}
+              </p>
+              <p>
+                <strong>Type de bien :</strong> {state.typeBien}
+              </p>
+              <p>
+                <strong>Prix total :</strong>{' '}
+                {total === 0 && state.mission !== 'locatif'
+                  ? 'Sur devis'
+                  : `${total.toFixed(2)} €`}
+              </p>
+              <p>
+                <strong>Résumé :</strong> {state.chambres} ch., {state.sdb} sdb, {state.surface} m²
+              </p>
+            </div>
           </div>
         </div>
         <p className="text-center text-xs text-slate-500 mt-6">
