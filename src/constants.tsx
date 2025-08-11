@@ -11,7 +11,7 @@ import {
   FaqItem,
   PriceMap,
   PriceOptions,
-  BookingStep,
+  Step,
 } from '@/types';
 import {
   CheckFileIcon,
@@ -26,16 +26,13 @@ import {
   ApartmentIcon,
   HouseIcon,
   WarehouseIcon,
-  CalendarIcon,
   UserCheckIcon,
 } from '@/components/Icons';
 
 export const NAV_LINKS: NavLink[] = [
   { name: 'Services', href: '#Services' },
   { name: 'Tarifs', href: '#Pricing' },
-  { name: 'Prendre RDV', href: '#Booking' },
   { name: 'Calculateur', href: '#Calculator' },
-  { name: 'Contact', href: '#Contact' },
 ];
 
 export const SERVICES: Service[] = [
@@ -85,23 +82,10 @@ export const SERVICES: Service[] = [
     duration: 60,
   },
 ];
-
-export const BOOKING_STEPS: BookingStep[] = [
-  { id: 'step-service', name: 'Service', icon: CheckFileIcon },
-  { id: 'step-date', name: 'Date & Heure', icon: CalendarIcon },
-  { id: 'step-info', name: 'Informations & Confirmation', icon: UserCheckIcon },
-];
-
-export const CALCULATOR_STEPS: BookingStep[] = [
+export const CALCULATOR_STEPS: Step[] = [
   { id: 'step-calc', name: 'Estimation', icon: EvaluationIcon },
   { id: 'step-contact', name: 'Contact', icon: UserCheckIcon },
 ];
-
-export const DEFAULT_BOOKING_SLOTS: string[] = (
-  import.meta.env.VITE_BOOKING_SLOTS || '10:00,12:00,14:00,16:00,18:00'
-)
-  .split(',')
-  .map((slot) => slot.trim());
 
 export const PROCESS_STEPS: ProcessStep[] = [
   {

@@ -3,6 +3,7 @@ import { calculatePrice } from '@/utils/pricing';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { CalculatorState, CalculatorContact } from '@/types';
 import { CALCULATOR_STEPS } from '@/constants';
+import { sendMail } from '@/services/firebaseMail';
 
 const initialCalculatorState: CalculatorState = {
   mission: 'locatif',
@@ -73,10 +74,12 @@ const CalculatorForm: React.FC = () => {
       email: '',
       phone: '',
       missionDetail: detail,
+      appointmentDate: '',
       message: createMessage(detail),
     };
   });
   const [currentStep, setCurrentStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleMissionChange = (newMission: CalculatorState['mission']) => {
     const defaultStateForMission: CalculatorState = {
@@ -126,15 +129,38 @@ const CalculatorForm: React.FC = () => {
     }));
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const subject = `Demande d'informations - ${contact.missionDetail}`;
-    const body = encodeURIComponent(
-      `Adresse du bien: ${contact.propertyAddress}\nNom et prénom: ${contact.fullName}\nEmail: ${contact.email}\nTéléphone: ${contact.phone}\n\n${contact.message}`
-    );
-    window.location.href = `mailto:Info@kdexpertise.be?subject=${encodeURIComponent(
-      subject
-    )}&body=${body}`;
+    setIsSubmitting(true);
+    const summary = `Type de mission: ${state.mission}\nType de bien: ${state.typeBien}\nPrix total: ${total.toFixed(2)} €\nRésumé: ${state.chambres} ch., ${state.sdb} sdb, ${state.surface} m²`;
+    try {
+      await sendMail({
+        type: 'calculator',
+        name: contact.fullName,
+        email: contact.email,
+        phone: contact.phone,
+        subject: `Demande d'informations - ${contact.missionDetail}`,
+        page: 'calculateur',
+        source: 'site',
+        appointment: contact.appointmentDate,
+        message: `${summary}\nAdresse du bien: ${contact.propertyAddress}\nMission détaillée: ${contact.missionDetail}\n\n${contact.message}`,
+      });
+      alert('Demande envoyée avec succès.');
+      const detail = missionDetailOptions[state.mission][0];
+      setContact({
+        propertyAddress: '',
+        fullName: '',
+        email: '',
+        phone: '',
+        missionDetail: detail,
+        appointmentDate: '',
+        message: createMessage(detail),
+      });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Erreur lors de l\'envoi.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const nextStep = () =>
@@ -168,68 +194,91 @@ const CalculatorForm: React.FC = () => {
         <CalculatorStepper currentStep={currentStep} />
         <div className="bg-white p-6 rounded-lg shadow-inner">
           <h4 className="text-xl font-bold text-blue-deep mb-4 text-center">Prendre contact</h4>
-          <form onSubmit={handleContactSubmit} className="space-y-4 max-w-xl mx-auto">
-            <input
-              type="text"
-              name="propertyAddress"
-              placeholder="Adresse du bien"
-              value={contact.propertyAddress}
-              onChange={handleContactChange}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-              required
-            />
-            <input
-              type="text"
-              name="fullName"
-              placeholder="Nom et prénom"
-              value={contact.fullName}
-              onChange={handleContactChange}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Adresse e-mail"
-              value={contact.email}
-              onChange={handleContactChange}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-              required
-            />
-            <input
-              type="tel"
-              name="phone"
-              placeholder="Numéro de téléphone"
-              value={contact.phone}
-              onChange={handleContactChange}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-            />
-            <select
-              name="missionDetail"
-              value={contact.missionDetail}
-              onChange={handleContactChange}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-            >
-              {missionDetailOptions[state.mission].map(option => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <textarea
-              name="message"
-              value={contact.message}
-              onChange={handleContactChange}
-              rows={4}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-            />
-            <button
-              type="submit"
-              className="w-full px-4 py-3 bg-orange-vif text-white rounded-lg font-semibold hover:bg-orange-vif-dark transition"
-            >
-              Envoyer ma demande
-            </button>
-          </form>
+          <div className="grid md:grid-cols-3 gap-6">
+            <form onSubmit={handleContactSubmit} className="space-y-4 md:col-span-2">
+              <input
+                type="text"
+                name="propertyAddress"
+                placeholder="Adresse du bien"
+                value={contact.propertyAddress}
+                onChange={handleContactChange}
+                className="w-full p-3 border border-gray-300 rounded-lg"
+                required
+              />
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Nom et prénom"
+                value={contact.fullName}
+                onChange={handleContactChange}
+                className="w-full p-3 border border-gray-300 rounded-lg"
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Adresse e-mail"
+                value={contact.email}
+                onChange={handleContactChange}
+                className="w-full p-3 border border-gray-300 rounded-lg"
+                required
+              />
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Numéro de téléphone"
+                value={contact.phone}
+                onChange={handleContactChange}
+                className="w-full p-3 border border-gray-300 rounded-lg"
+              />
+              <select
+                name="missionDetail"
+                value={contact.missionDetail}
+                onChange={handleContactChange}
+                className="w-full p-3 border border-gray-300 rounded-lg"
+              >
+                {missionDetailOptions[state.mission].map(option => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="datetime-local"
+                name="appointmentDate"
+                value={contact.appointmentDate}
+                onChange={handleContactChange}
+                className="w-full p-3 border border-gray-300 rounded-lg"
+                required
+              />
+              <p className="text-xs text-slate-500">
+                L'expert essayera de caler le rendez-vous à cette date mais il se peut qu'il soit déjà occupé.
+              </p>
+              <textarea
+                name="message"
+                value={contact.message}
+                onChange={handleContactChange}
+                rows={4}
+                className="w-full p-3 border border-gray-300 rounded-lg"
+              />
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full px-4 py-3 bg-orange-vif text-white rounded-lg font-semibold hover:bg-orange-vif-dark transition disabled:opacity-50"
+              >
+                {isSubmitting ? 'Envoi en cours...' : 'Envoyer ma demande'}
+              </button>
+            </form>
+            <div className="md:col-span-1 bg-blue-deep/5 p-4 rounded text-sm text-slate-600">
+              <h5 className="text-lg font-bold text-blue-deep mb-3">Récapitulatif</h5>
+              <p><strong>Type de mission :</strong> {state.mission}</p>
+              <p><strong>Type de bien :</strong> {state.typeBien}</p>
+              <p><strong>Prix total :</strong> {total.toFixed(2)} €</p>
+              <p>
+                <strong>Résumé :</strong> {state.chambres} ch., {state.sdb} sdb, {state.surface} m²
+              </p>
+            </div>
+          </div>
           <div className="mt-6 text-center">
             <button
               type="button"
