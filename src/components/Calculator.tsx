@@ -73,6 +73,7 @@ const CalculatorForm: React.FC = () => {
       email: '',
       phone: '',
       missionDetail: detail,
+      appointmentDate: '',
       message: createMessage(detail),
     };
   });
@@ -129,8 +130,9 @@ const CalculatorForm: React.FC = () => {
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const subject = `Demande d'informations - ${contact.missionDetail}`;
+    const summary = `Mission: ${state.mission}\nType de bien: ${state.typeBien}\nPrix total: ${total.toFixed(2)} €\nRésumé: ${state.chambres} ch., ${state.sdb} sdb, ${state.surface} m²`;
     const body = encodeURIComponent(
-      `Adresse du bien: ${contact.propertyAddress}\nNom et prénom: ${contact.fullName}\nEmail: ${contact.email}\nTéléphone: ${contact.phone}\n\n${contact.message}`
+      `${summary}\nDate souhaitée: ${contact.appointmentDate}\nAdresse du bien: ${contact.propertyAddress}\nNom et prénom: ${contact.fullName}\nEmail: ${contact.email}\nTéléphone: ${contact.phone}\n\n${contact.message}`
     );
     window.location.href = `mailto:Info@kdexpertise.be?subject=${encodeURIComponent(
       subject
@@ -168,6 +170,20 @@ const CalculatorForm: React.FC = () => {
         <CalculatorStepper currentStep={currentStep} />
         <div className="bg-white p-6 rounded-lg shadow-inner">
           <h4 className="text-xl font-bold text-blue-deep mb-4 text-center">Prendre contact</h4>
+          <div className="mb-4 p-4 bg-blue-deep/5 rounded text-sm text-slate-600">
+            <p>
+              <strong>Type de mission :</strong> {state.mission}
+            </p>
+            <p>
+              <strong>Type de bien :</strong> {state.typeBien}
+            </p>
+            <p>
+              <strong>Prix total :</strong> {total.toFixed(2)} €
+            </p>
+            <p>
+              <strong>Résumé :</strong> {state.chambres} ch., {state.sdb} sdb, {state.surface} m²
+            </p>
+          </div>
           <form onSubmit={handleContactSubmit} className="space-y-4 max-w-xl mx-auto">
             <input
               type="text"
@@ -216,6 +232,17 @@ const CalculatorForm: React.FC = () => {
                 </option>
               ))}
             </select>
+            <input
+              type="datetime-local"
+              name="appointmentDate"
+              value={contact.appointmentDate}
+              onChange={handleContactChange}
+              className="w-full p-3 border border-gray-300 rounded-lg"
+              required
+            />
+            <p className="text-xs text-slate-500">
+              L'expert essayera de caler le rendez-vous à cette date mais il se peut qu'il soit déjà occupé.
+            </p>
             <textarea
               name="message"
               value={contact.message}
