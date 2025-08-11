@@ -9,7 +9,7 @@ This contains everything you need to run your app locally.
 
 1. Install dependencies:
    `npm install`
-2. Copy `.env.example` to `.env` and fill in your Firebase credentials (see below). You can also adjust the `VITE_BOOKING_SLOTS` variable to control available booking times.
+2. Copy `.env.example` to `.env` and fill in your Firebase credentials (see below).
 3. Run the app:
    `npm run dev`
 
@@ -26,6 +26,5 @@ The application uses the following variables in the `.env` file:
 - `VITE_FIREBASE_MEASUREMENT_ID`
 - `VITE_FIREBASE_FUNCTION_URL` – URL of the Cloud Function used to send emails
 - `VITE_RECAPTCHA_SITE_KEY` – site key for Google reCAPTCHA
-- `VITE_BOOKING_SLOTS` – comma-separated list of available times (e.g. `10:00,12:00,14:00,16:00,18:00`)
 
 Deploy a Firebase Cloud Function that receives the form data and sends emails (via Nodemailer, SendGrid, etc.).
