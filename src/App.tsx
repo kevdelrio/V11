@@ -9,7 +9,6 @@ import Benefits from '@/components/Benefits';
 import Zones from '@/components/Zones';
 import Pricing from '@/components/Pricing';
 import Calculator from '@/components/Calculator';
-import Booking from '@/components/Booking';
 import Testimonials from '@/components/Testimonials';
 import Faq from '@/components/Faq';
 import Contact from '@/components/Contact';
@@ -42,7 +41,6 @@ const App: React.FC = () => {
                 <Zones />
                 <Pricing />
                 <Calculator />
-                <Booking />
                 <Testimonials />
                 <Faq />
                 <Contact />
