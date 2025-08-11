@@ -133,5 +133,6 @@ export interface CalculatorContact {
     email: string;
     phone: string;
     missionDetail: string;
+    appointmentDate: string;
     message: string;
 }

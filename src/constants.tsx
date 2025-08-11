@@ -33,9 +33,7 @@ import {
 export const NAV_LINKS: NavLink[] = [
   { name: 'Services', href: '#Services' },
   { name: 'Tarifs', href: '#Pricing' },
-  { name: 'Prendre RDV', href: '#Booking' },
   { name: 'Calculateur', href: '#Calculator' },
-  { name: 'Contact', href: '#Contact' },
 ];
 
 export const SERVICES: Service[] = [
